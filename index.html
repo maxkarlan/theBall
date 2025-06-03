@@ -65,6 +65,7 @@
         let infoButton;  // Button for info lightbox
         let uiButton;    // Button for UI elements
         let infoButtonUsed = false;  // Track if info button has been used
+        let lightboxToggledOff = false;  // Track if lightbox has been toggled off
 
         function setup() {
             createCanvas(windowWidth, windowHeight);
@@ -90,7 +91,7 @@
             
             // Create info button
             infoButton = createButton('Show Info');
-            infoButton.position(width/2 - 120, height - 50);  // Adjusted position for better centering
+            infoButton.position(width/2 - 60, height - 50);  // Centered when alone
             infoButton.style('padding', '10px 20px');
             infoButton.style('font-family', 'Arial');
             infoButton.style('font-size', '16px');
@@ -99,24 +100,9 @@
             infoButton.style('border', 'none');
             infoButton.style('border-radius', '5px');
             infoButton.style('cursor', 'pointer');
-            infoButton.style('display', 'none');  // Hide completely initially
-            infoButton.style('transition', 'opacity 0.5s');
+            infoButton.style('display', 'block');
+            infoButton.style('transition', 'opacity 0.5s, background-color 0.5s, left 0.5s');
             infoButton.mousePressed(toggleInfo);
-            
-            // Create UI button
-            uiButton = createButton('Show Diagram');
-            uiButton.position(width/2 + 20, height - 50);
-            uiButton.style('padding', '10px 20px');
-            uiButton.style('font-family', 'Arial');
-            uiButton.style('font-size', '16px');
-            uiButton.style('background-color', '#2196F3');
-            uiButton.style('color', 'white');
-            uiButton.style('border', 'none');
-            uiButton.style('border-radius', '5px');
-            uiButton.style('cursor', 'pointer');
-            uiButton.style('display', 'none');  // Hide completely initially
-            uiButton.style('transition', 'opacity 0.5s');
-            uiButton.mousePressed(toggleUI);
             
             // Initialize ball position
             ball.x = width / 2;
@@ -126,10 +112,25 @@
         function toggleInfo() {
             showInfo = !showInfo;
             infoButton.html(showInfo ? 'Hide Info' : 'Show Info');
-            if (!infoButtonUsed) {
-                infoButtonUsed = true;
-                uiButton.style('display', 'block');  // Show UI button
-                uiButton.style('opacity', '1');
+            
+            if (!showInfo && !lightboxToggledOff) {
+                // First time lightbox is toggled off
+                lightboxToggledOff = true;
+                // Create and show UI button
+                uiButton = createButton('Show Diagram');
+                uiButton.position(width/2 + 20, height - 50);
+                uiButton.style('padding', '10px 20px');
+                uiButton.style('font-family', 'Arial');
+                uiButton.style('font-size', '16px');
+                uiButton.style('background-color', '#2196F3');
+                uiButton.style('color', 'white');
+                uiButton.style('border', 'none');
+                uiButton.style('border-radius', '5px');
+                uiButton.style('cursor', 'pointer');
+                uiButton.style('transition', 'opacity 0.5s');
+                uiButton.mousePressed(toggleUI);
+                // Move info button to left position
+                infoButton.position(width/2 - 120, height - 50);
             }
         }
 
@@ -143,10 +144,21 @@
         function draw() {
             background(255, 238, 207);
             
-            // Show info button after 10 seconds
-            if (millis() - startTime > 10000) {
-                infoButton.style('display', 'block');  // Show info button
-                infoButton.style('opacity', '1');
+            // Update button state based on time
+            let timeElapsed = millis() - startTime;
+            if (timeElapsed <= 10000) {
+                // During countdown period
+                infoButton.style('background-color', '#cccccc');
+                infoButton.style('cursor', 'default');
+                infoButton.style('pointer-events', 'none');
+                let secondsLeft = Math.ceil((10000 - timeElapsed) / 1000);
+                infoButton.html(`Show Info (${secondsLeft}s)`);
+            } else {
+                // After countdown period
+                infoButton.style('background-color', '#4CAF50');
+                infoButton.style('cursor', 'pointer');
+                infoButton.style('pointer-events', 'auto');
+                infoButton.html(showInfo ? 'Hide Info' : 'Show Info');
             }
             
             // Update force from slider
@@ -382,19 +394,21 @@
 
         function windowResized() {
             resizeCanvas(windowWidth, windowHeight);
-            blurBuffer.resizeCanvas(windowWidth, windowHeight);  // Resize the buffer
+            blurBuffer.resizeCanvas(windowWidth, windowHeight);
             
             // Reset ball position and velocity
-            ball.x = width / 2;  // Keep ball centered horizontally
-            ball.y = height / 3 + ball.radius;  // Reset to initial position
-            ball.velocity = 20;  // Reset to initial velocity
+            ball.x = width / 2;
+            ball.y = height / 3 + ball.radius;
+            ball.velocity = 20;
             
-            // Keep buttons centered
-            if (infoButton) {
+            // Update button positions
+            if (lightboxToggledOff) {
+                // Both buttons visible
                 infoButton.position(width/2 - 120, height - 50);
-            }
-            if (uiButton) {
                 uiButton.position(width/2 + 20, height - 50);
+            } else {
+                // Only info button visible
+                infoButton.position(width/2 - 60, height - 50);
             }
         }
     </script>
