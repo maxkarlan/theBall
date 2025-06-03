@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palpable Tension</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            overflow: hidden;  /* Prevent scrollbars */
+        }
+        html {
+            overflow: hidden;  /* Prevent scrollbars on html element as well */
+        }
+        .vector-notation {
+            position: relative;
+            display: inline-block;
+        }
+        .vector-arrow {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Ball properties
+        let ball = {
+            x: 0,
+            y: 0,
+            radius: 100,
+            velocity: 20,
+            force: 40
+        };
+
+        let blurBuffer;  // Graphics buffer for blurred backgrounds
+        let forceSlider; // Slider for force control
+        let showUI = false;  // Toggle for UI elements
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            blurBuffer = createGraphics(windowWidth, windowHeight);  // Create buffer
+            
+            // Create force slider
+            forceSlider = createSlider(20, 100, ball.force, 1);
+            forceSlider.position(20, 40);
+            forceSlider.style('width', '200px');
+            forceSlider.hide();  // Hide slider initially
+            
+            // Add label above slider
+            let sliderLabel = createP('Magnitude of upward force applied to the ball');
+            sliderLabel.position(20, 15);
+            sliderLabel.style('font-family', 'Arial');
+            sliderLabel.style('font-size', '14px');
+            sliderLabel.style('margin', '0');
+            sliderLabel.style('padding', '0');
+            sliderLabel.style('color', '#333');
+            sliderLabel.style('font-weight', '500');
+            sliderLabel.hide();  // Hide label initially
+            
+            // Initialize ball position
+            ball.x = width / 2;
+            ball.y = height / 3 + ball.radius;
+        }
+
+        function keyPressed() {
+            if (keyCode === 32) {  // Space bar
+                showUI = !showUI;
+                forceSlider.style('display', showUI ? 'block' : 'none');
+                select('p').style('display', showUI ? 'block' : 'none');
+            }
+        }
+
+        function draw() {
+            background(240);
+            
+            // Update force from slider
+            ball.force = forceSlider.value();
+            
+            // Calculate the wall position (1/3 down the window)
+            let wallY = height / 3;
+            
+            // Block dimensions
+            let blockWidth = 40;
+            let blockHeight = 20;
+            
+            // Draw the wall
+            noStroke();
+            
+            // Calculate how many blocks we need
+            let numBlocks = ceil(width * 0.5 / blockWidth);
+            
+            // Calculate the total wall width
+            let totalWallWidth = numBlocks * blockWidth;
+            
+            // Calculate the starting x position to center the wall
+            let startX = (width - totalWallWidth) / 2;
+            
+            // Draw each block with 3D effect
+            for (let i = 0; i < numBlocks; i++) {
+                let blockX = startX + (i * blockWidth);
+                
+                // Create gradient for each block
+                let blockGradient = drawingContext.createLinearGradient(
+                    blockX, wallY,                    // Start at top
+                    blockX, wallY + blockHeight       // End at bottom
+                );
+                blockGradient.addColorStop(0, '#d4d4d4');    // Bright metallic at top
+                blockGradient.addColorStop(0.3, '#a0a0a0');  // Medium metallic
+                blockGradient.addColorStop(0.7, '#707070');  // Dark metallic
+                blockGradient.addColorStop(1, '#505050');    // Darkest at bottom
+                
+                // Draw main block
+                drawingContext.fillStyle = blockGradient;
+                rect(blockX, wallY, blockWidth, blockHeight, 2);  // Added slight corner radius
+                
+                // Add metallic highlight on top
+                drawingContext.fillStyle = '#e8e8e8';
+                rect(blockX, wallY, blockWidth, 3);
+                
+                // Add metallic shadow on bottom
+                drawingContext.fillStyle = '#404040';
+                rect(blockX, wallY + blockHeight - 3, blockWidth, 3);
+                
+                // Add subtle vertical highlight
+                let highlightGradient = drawingContext.createLinearGradient(
+                    blockX, wallY,                    // Start at left
+                    blockX + blockWidth, wallY        // End at right
+                );
+                highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+                highlightGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)');
+                highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+                drawingContext.fillStyle = highlightGradient;
+                rect(blockX, wallY, blockWidth, blockHeight);
+            }
+
+            // Update ball physics
+            ball.velocity += ball.force; // Apply constant upward force
+            ball.y -= ball.velocity; // Update position
+
+            // Check for collision with wall
+            if (ball.y - ball.radius <= wallY + blockHeight) {
+                ball.y = wallY + blockHeight + ball.radius;
+                ball.velocity = -ball.velocity * 0; // Bounce with 0% energy retention
+            }
+
+            // Draw the ball
+            noStroke();
+            // Create radial gradient for 3D effect
+            let ballGradient = drawingContext.createRadialGradient(
+                ball.x - ball.radius/2, ball.y - ball.radius/2, 0,  // Inner circle (highlight)
+                ball.x, ball.y, ball.radius  // Outer circle (shadow)
+            );
+            ballGradient.addColorStop(0, '#ff6b6b');    // Bright red at center
+            ballGradient.addColorStop(0.7, '#ff0000');  // Medium red
+            ballGradient.addColorStop(1, '#cc0000');    // Dark red at edges
+            drawingContext.fillStyle = ballGradient;
+            circle(ball.x, ball.y, ball.radius * 2);
+
+            // Only draw vectors and labels if UI is shown
+            if (showUI) {
+                // Calculate effective velocity (0 when ball is against wall)
+                let wallY = height / 3;
+                let blockHeight = 20;
+                let effectiveVelocity = (ball.y - ball.radius <= wallY + blockHeight || Math.abs(ball.velocity) < 1) ? 0 : ball.velocity;
+                
+                // Draw force vector (green) first
+                stroke(0, 255, 0);
+                strokeWeight(2);
+                let forceLength = ball.force * 2; // Scale up for visualization
+                drawArrow(ball.x, ball.y, ball.x, ball.y - forceLength, 10);
+                
+                // Draw velocity vector (blue) on top
+                stroke(0, 0, 255);
+                strokeWeight(2);
+                let velocityLength = effectiveVelocity * 0.5; // Scale down for visualization
+                drawArrow(ball.x, ball.y, ball.x, ball.y - velocityLength, 10);
+
+                // Create vector notation for velocity
+                let velocityText = `v = ${Math.abs(Math.round(effectiveVelocity))}`;
+                let velocityX = ball.x + 20;
+                let velocityY = ball.y - velocityLength;
+                
+                // Create vector notation for force
+                let forceText = `F = ${ball.force}`;
+                let forceX = ball.x + 20;
+                let forceY = ball.y - forceLength;
+                
+                // Calculate text widths
+                let velocityWidth = textWidth(velocityText) + 30;  // Increased padding
+                let forceWidth = textWidth(forceText) + 30;        // Increased padding
+                
+                // Clear the blur buffer
+                blurBuffer.clear();
+                
+                // Draw background boxes in the blur buffer
+                blurBuffer.fill(255, 255, 255, 225);  // White with 88% opacity
+                blurBuffer.noStroke();
+                blurBuffer.rect(velocityX - 15, velocityY - 25, velocityWidth, 35, 10);  // Adjusted size and padding
+                blurBuffer.rect(forceX - 15, forceY - 25, forceWidth, 35, 10);           // Adjusted size and padding
+                
+                // Apply blur to the buffer
+                blurBuffer.filter(BLUR, 2);
+                
+                // Draw the blurred buffer
+                image(blurBuffer, 0, 0);
+                
+                // Draw the labels with arrows
+                fill(0);  // Reset to black for text
+                noStroke();  // Remove text outline
+                textSize(25);  // Main text size
+                text(velocityText, velocityX, velocityY);
+                textSize(22);  // Arrow text size
+                text('→', velocityX - 4, velocityY - 12);
+                
+                textSize(25);  // Main text size
+                text(forceText, forceX, forceY);
+                textSize(22);  // Arrow text size
+                text('→', forceX - 1.5, forceY - 15);
+            }
+        }
+
+        // Helper function to draw an arrow
+        function drawArrow(x1, y1, x2, y2, arrowSize) {
+            // Force upward direction for vertical vectors
+            let angle = -PI/2;
+            let length = dist(x1, y1, x2, y2);
+            
+            push();
+            translate(x1, y1);
+            rotate(angle);
+            line(0, 0, length, 0);
+            line(length, 0, length - arrowSize, -arrowSize/2);
+            line(length, 0, length - arrowSize, arrowSize/2);
+            pop();
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+            blurBuffer.resizeCanvas(windowWidth, windowHeight);  // Resize the buffer
+            
+            // Reset ball position and velocity
+            ball.x = width / 2;  // Keep ball centered horizontally
+            ball.y = height / 3 + ball.radius;  // Reset to initial position
+            ball.velocity = 20;  // Reset to initial velocity
+        }
+    </script>
+</body>
+</html> 
