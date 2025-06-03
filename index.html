@@ -76,7 +76,7 @@
             
             // Create info button
             infoButton = createButton('Show Info');
-            infoButton.position(width/2 - 100, height - 50);
+            infoButton.position(width/2 - 120, height - 50);  // Adjusted position for better centering
             infoButton.style('padding', '10px 20px');
             infoButton.style('font-family', 'Arial');
             infoButton.style('font-size', '16px');
@@ -341,7 +341,7 @@
                 let textY = lightboxY + 40;
                 let LbTextWidth = lightboxWidth - 80;
                 
-                text("The ball appears still, but written into its code is a constant and endless force, forever trying to propel it upward and out of the window.\n\nAn indestructible and immovable metal bar sits above the ball and is angled perpendicular to the encoded force. The scene exists in a vacuum, meaning there is no friction, no gravity, and no air resistance.\n\nVisually and functionally nothing changes as you watch this scene. It will always be a live stream of a red ball trapped in the pursuit of an impossible task.", 
+                text("The ball appears static, but written into its code is a constant and endless force, forever trying to propel it upward and out of the window.\n\nAn indestructible and immovable metal bar sits above the ball and is angled perpendicular to the encoded force. The scene exists in a vacuum, meaning there is no friction, no gravity, and no air resistance.\n\nVisually and functionally nothing changes as you watch this scene. It will always be a live stream of a red ball trapped in the pursuit of an impossible task.", 
                      textX, textY, LbTextWidth);
                 
                 // Reset all text properties to their default state
@@ -374,6 +374,14 @@
             ball.x = width / 2;  // Keep ball centered horizontally
             ball.y = height / 3 + ball.radius;  // Reset to initial position
             ball.velocity = 20;  // Reset to initial velocity
+            
+            // Keep buttons centered
+            if (infoButton) {
+                infoButton.position(width/2 - 120, height - 50);
+            }
+            if (uiButton) {
+                uiButton.position(width/2 + 20, height - 50);
+            }
         }
     </script>
 </body>
