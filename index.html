@@ -178,7 +178,15 @@
                 stroke(0, 255, 0);
                 strokeWeight(2);
                 let forceLength = ball.force * 2; // Scale up for visualization
+                
+                // Draw upward force arrow (solid)
+                drawingContext.setLineDash([]);  // Solid line
                 drawArrow(ball.x, ball.y, ball.x, ball.y - forceLength, 10);
+                
+                // Draw downward force arrow (dotted)
+                drawingContext.setLineDash([5, 5]);  // Dotted line
+                drawArrow(ball.x, ball.y, ball.x, ball.y + forceLength, 10);
+                drawingContext.setLineDash([]);  // Reset to solid line
                 
                 // Draw velocity vector (blue) on top
                 stroke(0, 0, 255);
@@ -196,9 +204,15 @@
                 let forceX = ball.x + 20;
                 let forceY = ball.y - forceLength;
                 
+                // Create vector notation for wall force
+                let wallForceText = `F = ${ball.force}`;
+                let wallForceX = ball.x + 20;
+                let wallForceY = ball.y + forceLength;
+                
                 // Calculate text widths
                 let velocityWidth = textWidth(velocityText) + 30;  // Increased padding
                 let forceWidth = textWidth(forceText) + 30;        // Increased padding
+                let wallForceWidth = textWidth(wallForceText) + 30;  // Increased padding
                 
                 // Clear the blur buffer
                 blurBuffer.clear();
@@ -208,6 +222,7 @@
                 blurBuffer.noStroke();
                 blurBuffer.rect(velocityX - 15, velocityY - 25, velocityWidth, 35, 10);  // Adjusted size and padding
                 blurBuffer.rect(forceX - 15, forceY - 25, forceWidth, 35, 10);           // Adjusted size and padding
+                blurBuffer.rect(wallForceX - 15, wallForceY - 25, wallForceWidth, 35, 10);  // Wall force background
                 
                 // Apply blur to the buffer
                 blurBuffer.filter(BLUR, 2);
@@ -227,13 +242,18 @@
                 text(forceText, forceX, forceY);
                 textSize(22);  // Arrow text size
                 text('→', forceX - 1.5, forceY - 15);
+                
+                textSize(25);  // Main text size
+                text(wallForceText, wallForceX, wallForceY);
+                textSize(22);  // Arrow text size
+                text('→', wallForceX - 1.5, wallForceY - 15);
             }
         }
 
         // Helper function to draw an arrow
         function drawArrow(x1, y1, x2, y2, arrowSize) {
             // Force upward direction for vertical vectors
-            let angle = -PI/2;
+            let angle = atan2(y2 - y1, x2 - x1);
             let length = dist(x1, y1, x2, y2);
             
             push();
