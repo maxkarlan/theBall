@@ -46,6 +46,7 @@
         let blurBuffer;  // Graphics buffer for blurred backgrounds
         let forceSlider; // Slider for force control
         let showUI = false;  // Toggle for UI elements
+        let showInfo = false;  // Toggle for info lightbox
 
         function setup() {
             createCanvas(windowWidth, windowHeight);
@@ -78,6 +79,9 @@
                 showUI = !showUI;
                 forceSlider.style('display', showUI ? 'block' : 'none');
                 select('p').style('display', showUI ? 'block' : 'none');
+            }
+            if (keyCode === 73) {  // 'i' key
+                showInfo = !showInfo;
             }
         }
 
@@ -167,6 +171,11 @@
             drawingContext.fillStyle = ballGradient;
             circle(ball.x, ball.y, ball.radius * 2);
 
+            // Add white dot in center
+            fill(255);
+            noStroke();
+            circle(ball.x, ball.y, 10);
+
             // Only draw vectors and labels if UI is shown
             if (showUI) {
                 // Calculate effective velocity (0 when ball is against wall)
@@ -247,6 +256,42 @@
                 text(wallForceText, wallForceX, wallForceY);
                 textSize(22);  // Arrow text size
                 text('→', wallForceX - 1.5, wallForceY - 15);
+            }
+
+            // Draw info lightbox if active
+            if (showInfo) {
+                // Create semi-transparent white background with blur
+                let lightboxWidth = width * 0.6;
+                let lightboxHeight = height * 0.9;  // Increased to 90% of window height
+                let lightboxX = (width - lightboxWidth) / 2;
+                let lightboxY = (height - lightboxHeight) / 2;
+                
+                // Draw blurred background
+                drawingContext.shadowColor = 'rgba(0, 0, 0, 0.2)';
+                drawingContext.shadowBlur = 20;
+                drawingContext.shadowOffsetX = 0;
+                drawingContext.shadowOffsetY = 0;
+                
+                // Draw main lightbox
+                fill(255, 255, 255, 245);
+                rect(lightboxX, lightboxY, lightboxWidth, lightboxHeight, 20);
+                
+                // Reset shadow
+                drawingContext.shadowColor = 'transparent';
+                
+                // Format and draw text
+                fill(0);
+                noStroke();
+                textSize(18);
+                textAlign(LEFT, TOP);
+                textLeading(28);
+                
+                let textX = lightboxX + 40;
+                let textY = lightboxY + 40;
+                let textWidth = lightboxWidth - 80;
+                
+                text("The ball appears still, but written into its code is a constant and endless force, forever trying to propel it upward and out of the window.\n\nAn indestructible and immovable metal bar sits above the ball and perpendicular to the encoded force. The scene exists in a vacuum, meaning there is no friction, no gravity, and no air resistance.\n\nVisually and functionally nothing changes as you watch this scene. It will always be a live stream of a red ball trapped in the pursuit of an impossible task.", 
+                     textX, textY, textWidth);
             }
         }
 
