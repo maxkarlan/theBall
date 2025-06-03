@@ -326,8 +326,8 @@
             // Draw info lightbox if active (now drawn last, on top of everything)
             if (showInfo) {
                 // Create semi-transparent white background with blur
-                let lightboxWidth = width * 0.6;
-                let lightboxHeight = height * 0.9;  // Increased to 90% of window height
+                let lightboxWidth = windowWidth <= 768 ? width * 0.9 : width * 0.6;  // 90% width on mobile, 60% on desktop
+                let lightboxHeight = height * 0.9;
                 let lightboxX = (width - lightboxWidth) / 2;
                 let lightboxY = (height - lightboxHeight) / 2;
                 
@@ -347,13 +347,13 @@
                 // Format and draw text
                 fill(0);
                 noStroke();
-                textSize(18);
+                textSize(windowWidth <= 768 ? 16 : 18);  // Slightly smaller text on mobile
                 textAlign(LEFT, TOP);
-                textLeading(28);
+                textLeading(windowWidth <= 768 ? 24 : 28);  // Adjusted line height for mobile
                 
-                let textX = lightboxX + 40;
-                let textY = lightboxY + 40;
-                let LbTextWidth = lightboxWidth - 80;
+                let textX = lightboxX + (windowWidth <= 768 ? 20 : 40);  // Less padding on mobile
+                let textY = lightboxY + (windowWidth <= 768 ? 20 : 40);  // Less padding on mobile
+                let LbTextWidth = lightboxWidth - (windowWidth <= 768 ? 40 : 80);  // More text width on mobile
                 
                 text("The ball appears static, but written into its code is a constant and endless force, forever trying to propel it upward and out of the window.\n\nAn indestructible and immovable metal bar sits above the ball and is angled perpendicular to the encoded force. The scene exists in a vacuum, meaning there is no friction, no gravity, and no air resistance.\n\nVisually and functionally nothing changes as you watch this scene. It will always be a live stream of a red ball trapped in the pursuit of an impossible task.", 
                      textX, textY, LbTextWidth);
