@@ -106,7 +106,7 @@
             
             // Initialize ball position
             ball.x = width / 2;
-            ball.y = height / 3 + ball.radius;
+            ball.y = height / 4 + ball.radius;
         }
 
         function toggleInfo() {
@@ -165,7 +165,7 @@
             ball.force = forceSlider.value();
             
             // Calculate the wall position (1/3 down the window)
-            let wallY = height / 3;
+            let wallY = height / 4;
             
             // Block dimensions
             let blockWidth = 40;
@@ -228,7 +228,7 @@
             // Check for collision with wall
             if (ball.y - ball.radius <= wallY + blockHeight) {
                 ball.y = wallY + blockHeight + ball.radius;
-                ball.velocity = -ball.velocity * 0; // Bounce with 0% energy retention
+                ball.velocity = -ball.velocity * .5; // Bounce with 0% energy retention
             }
 
             // Draw the ball
@@ -252,7 +252,7 @@
             // Only draw vectors and labels if UI is shown
             if (showUI) {
                 // Calculate effective velocity (0 when ball is against wall)
-                let wallY = height / 3;
+                let wallY = height / 4;
                 let blockHeight = 20;
                 let effectiveVelocity = (ball.y - ball.radius <= wallY + blockHeight || Math.abs(ball.velocity) < 1) ? 0 : ball.velocity;
                 
@@ -398,7 +398,7 @@
             
             // Reset ball position and velocity
             ball.x = width / 2;
-            ball.y = height / 3 + ball.radius;
+            ball.y = height / 4 + ball.radius;
             ball.velocity = 20;
             
             // Update button positions
