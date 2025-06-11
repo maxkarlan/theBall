@@ -456,7 +456,7 @@
             // Only draw vectors and labels if UI is shown
             if (showUI) {
                 // Add white dot in center (proportional to ball radius)
-                fill(255);
+                fill(34, 34, 34);  // Eerie black (#222)
                 noStroke();
                 circle(ball.x, ball.y, ball.radius * 0.1);  // 10% of ball radius
                 
@@ -464,7 +464,7 @@
                 let effectiveVelocity = (ball.y - ball.radius <= wallY + blockHeight || Math.abs(ball.velocity) < 1) ? 0 : ball.velocity;
                 
                 // Draw force vector (green) first
-                stroke(255, 255, 255);
+                stroke(34, 34, 34);  // Eerie black (#222)
                 strokeWeight(ball.radius * 0.02);  // 2% of ball radius
                 let maxForceLength = ball.radius * 2; // Maximum length is 2x ball radius
                 let minForceLength = maxForceLength * 0.2; // Minimum length is 1/5th of maximum
@@ -480,7 +480,7 @@
                 drawingContext.setLineDash([]);  // Reset to solid line
                 
                 // Draw velocity vector (blue) on top
-                stroke(255, 255, 255);
+                stroke(34, 34, 34);  // Eerie black (#222)
                 strokeWeight(ball.radius * 0.02);  // 2% of ball radius
                 let velocityLength = effectiveVelocity * 0.5; // Scale down for visualization
                 drawArrow(ball.x, ball.y, ball.x, ball.y - velocityLength, ball.radius * 0.1);
