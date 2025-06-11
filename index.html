@@ -83,7 +83,7 @@
             ball.radius = totalHeight * 0.8;
             
             // Calculate wall height (1/4 of ball radius)
-            blockHeight = ball.radius * 0.25;
+            blockHeight = ball.radius * 0.125;  // Half of previous height (0.25/2)
             
             // First set the wall position at 1/4th of canvas height
             wallY = height * 0.25;
@@ -184,7 +184,7 @@
                 buttonDivider.parent(buttonBar);
                 buttonDivider.style('width', '2px');
                 buttonDivider.style('height', '60%');
-                buttonDivider.style('background', '#C88A00');  // Darker shade of #DE9800
+                buttonDivider.style('background', '#FAFAFA');  // Seasalt
                 buttonDivider.style('margin', 'auto 0');
                 buttonDivider.style('position', 'absolute');
                 buttonDivider.style('left', 'calc(50% - 1px)');  // Center exactly, accounting for divider width
@@ -354,7 +354,7 @@
         }
 
         function draw() {
-            background(222, 152, 0);  // #DE9800
+            background(250, 250, 250);  // #DE9800
             
             // Reset text properties
             fill(255);  // Set text color to white
