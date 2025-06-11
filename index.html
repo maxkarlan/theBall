@@ -123,7 +123,7 @@
             // Create button bar container
             buttonBar = createDiv();
             buttonBar.style('position', 'absolute');
-            buttonBar.style('left', `${width/2 - 70}px`);
+            buttonBar.style('left', `${width/2 - 70}px`);  // Initial position for 140px width
             buttonBar.style('top', `${height - 60}px`);
             buttonBar.style('display', 'flex');
             buttonBar.style('flex-direction', 'row');
@@ -131,7 +131,7 @@
             buttonBar.style('border-radius', '8px');
             buttonBar.style('background', 'rgba(255,255,255,0.95)');
             buttonBar.style('z-index', '10');
-            buttonBar.style('transition', 'width 0.5s');
+            buttonBar.style('transition', 'width 0.5s, left 0.5s');
             buttonBar.style('width', '140px');
             buttonBar.style('height', '48px');
             
@@ -152,7 +152,7 @@
             infoButton.style('box-shadow', 'none');
             infoButton.style('transition', 'background 0.3s, box-shadow 0.3s, color 0.3s, border-radius 0.3s');
             infoButton.style('position', 'relative');
-            infoButton.style('z-index', showInfo ? '2' : '1');
+            infoButton.style('z-index', showInfo ? '3' : '1');
             infoButton.mousePressed(() => {
                 if (showInfo) {
                     showInfo = false;
@@ -174,7 +174,7 @@
         function showDiagramButton() {
             // Expand the bar
             buttonBar.style('width', '280px');
-            buttonBar.style('left', `${width/2 - 140}px`);
+            buttonBar.style('left', `${width/2 - 140}px`);  // Adjust left position for 280px width
             // Update info button border radius and width
             infoButton.style('width', '50%');
             infoButton.style('border-radius', '8px 0 0 8px');
@@ -187,9 +187,9 @@
                 buttonDivider.style('background', '#C88A00');  // Darker shade of #DE9800
                 buttonDivider.style('margin', 'auto 0');
                 buttonDivider.style('position', 'absolute');
-                buttonDivider.style('left', '50%');
+                buttonDivider.style('left', 'calc(50% - 1px)');  // Center exactly, accounting for divider width
                 buttonDivider.style('top', '20%');
-                buttonDivider.style('z-index', '20');  // Higher than button bar's z-index of 10
+                buttonDivider.style('z-index', '2');  // Lower than glow
                 buttonDivider.style('opacity', '0');
                 buttonDivider.style('transition', 'opacity 0.3s');
             }
@@ -252,23 +252,22 @@
             // Unified color for both states
             const offColor = '#222';
             const onColor = '#333';
-            const glow = '0 0 8px 2px #aee6ff, 0 0 0 2px #aee6ff';
+            const glow = '0 0 8px 2px #aee6ff, 0 0 0 2px #aee6ff, 2px 0 0 0 #aee6ff';
+            const glowRight = '0 0 8px 2px #aee6ff, 0 0 0 2px #aee6ff, -2px 0 0 0 #aee6ff';
             // Info button
             infoButton.style('background', showInfo ? onColor : offColor);
             infoButton.style('color', '#f0f0f0');
-            infoButton.style('box-shadow', showInfo ? 
-                '0 0 8px 2px #aee6ff, 0 0 0 2px #aee6ff, 2px 0 0 0 #aee6ff' : 'none');
+            infoButton.style('box-shadow', showInfo ? glow : 'none');
             infoButton.style('transition', 'background 0.3s, box-shadow 0.3s, color 0.3s, border-radius 0.3s');
             infoButton.style('position', 'relative');
-            infoButton.style('z-index', showInfo ? '2' : '1');
+            infoButton.style('z-index', showInfo ? '3' : '1');
             // Diagram button (if present)
             if (diagramButtonVisible && uiButton) {
                 uiButton.style('background', showUI ? onColor : offColor);
                 uiButton.style('color', '#f0f0f0');
-                uiButton.style('box-shadow', showUI ? 
-                    '0 0 8px 2px #aee6ff, 0 0 0 2px #aee6ff, -2px 0 0 0 #aee6ff' : 'none');
+                uiButton.style('box-shadow', showUI ? glowRight : 'none');
                 uiButton.style('position', 'relative');
-                uiButton.style('z-index', showUI ? '2' : '1');
+                uiButton.style('z-index', showUI ? '3' : '1');
                 // Only update text if already faded in
                 if (diagramButtonReady) {
                     uiButton.html(showUI ? 'Hide Diagram' : 'Show Diagram');
@@ -316,7 +315,7 @@
             let idealHeight = textHeight + (padding * 2);
             
             // Use the smaller of ideal height or max available height
-            let lightboxHeight = Math.min(idealHeight, maxAvailableHeight);
+            let lightboxHeight = Math.min(idealHeight, maxAvailableHeight) * 1.125;  // Add 2.5% to height
             
             let lightboxX = (width - lightboxWidth) / 2;
             let lightboxY = (height - lightboxHeight) / 2 - (buttonSpace / 2);  // Center between buffers
@@ -583,10 +582,10 @@
             if (buttonBar) {
                 if (diagramButtonVisible) {
                     buttonBar.style('width', '280px');
-                    buttonBar.style('left', `${width/2 - 140}px`);
+                    buttonBar.style('left', `${width/2 - 140}px`);  // Adjust left position for 280px width
                 } else {
                     buttonBar.style('width', '140px');
-                    buttonBar.style('left', `${width/2 - 70}px`);
+                    buttonBar.style('left', `${width/2 - 70}px`);  // Adjust left position for 140px width
                 }
                 buttonBar.style('top', `${height - 60}px`);
             }
