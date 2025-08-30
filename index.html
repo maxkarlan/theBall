@@ -71,6 +71,8 @@
         let textContainer;  // Reference to the text container
         let textContent = "The ball appears static, but written into its code is a constant force, forever trying to propel it upward and out of the window.<br><br>An indestructible and immovable wall sits above the ball and is angled perpendicular to the encoded force. The scene exists in a vacuum, meaning there is no friction, no gravity, and no air resistance.<br><br>Visually and functionally nothing changes as you watch. It will always be a live stream of a ball trapped in the pursuit of an impossible task.";
         let buttonBar; // Container for the two buttons
+        let isScrolledToTop = true;  // Track if user is at top of scroll
+        let isScrolledToBottom = false;  // Track if user is at bottom of scroll
         let diagramButtonVisible = false; // Track if Show Diagram should be shown
         let diagramButtonReady = false; // Track if Show Diagram button is ready for text
         let buttonDivider; // Divider between buttons
@@ -101,14 +103,8 @@
             // Calculate initial dimensions
             calculateDimensions();
             
-            // Create force slider
-            forceSlider = createSlider(20, 100, ball.force, 1);
-            forceSlider.position(20, 40);
-            forceSlider.style('width', '200px');
-            forceSlider.style('background', '#222');
-            forceSlider.hide();  // Hide slider initially
-            
-            // Add label above slider
+            // Create and render slider label first
+            let maxSliderWidth = width / 3;  // Maximum one-third of window width
             let sliderLabel = createP('Current magnitude of upward force');
             sliderLabel.position(20, 15);
             sliderLabel.style('font-family', 'Arial');
@@ -117,7 +113,24 @@
             sliderLabel.style('padding', '0');
             sliderLabel.style('color', '#333');
             sliderLabel.style('font-weight', '500');
-            sliderLabel.hide();  // Hide label initially
+            sliderLabel.style('width', `${maxSliderWidth}px`);
+            sliderLabel.style('word-wrap', 'break-word');
+            
+            // Force a reflow to ensure the label is rendered and height is calculated
+            sliderLabel.elt.offsetHeight;
+            
+            // Now create the slider positioned below the label (before hiding the label)
+            let labelHeight = sliderLabel.elt.offsetHeight;
+            let sliderY = 15 + labelHeight + 10; // 15px (label top) + label height + 10px spacing
+            
+            // Hide label after measuring its height
+            sliderLabel.hide();
+            
+            forceSlider = createSlider(20, 100, ball.force, 1);
+            forceSlider.position(20, sliderY);
+            forceSlider.style('width', `${maxSliderWidth}px`);
+            forceSlider.style('background', '#222');
+            forceSlider.hide();  // Hide slider initially
             
             // Create button bar container
             buttonBar = createDiv();
@@ -158,6 +171,9 @@
                 } else {
                     showInfo = true;
                     showUI = false;
+                    // Reset scroll state when opening lightbox
+                    isScrolledToTop = true;
+                    isScrolledToBottom = false;
                     if (!diagramButtonVisible) {
                         diagramButtonVisible = true;
                         showDiagramButton();
@@ -300,18 +316,33 @@
             let lightboxWidth = Math.min(textWidth + (padding * 2), maxWidth);
             
             // Calculate maximum available height (accounting for button space and minimum edge buffer)
-            let minEdgeBuffer = height * 0.08; // 8% of window height for top and bottom edges
-            let buttonSpace = height * 0.1; // 10% of window height for buttons
-            let maxAvailableHeight = height - (minEdgeBuffer * 2) - buttonSpace;
+            let minEdgeBuffer = 10; // 8% of window height for top and bottom edges
+            let buttonSpace = 60; // 10% of window height for buttons
+            let buttonBuffer = 10; // 5% additional buffer above buttons
+            let maxAvailableHeight = height - (minEdgeBuffer * 2) - buttonSpace - buttonBuffer;
             
             // Calculate ideal height based on content
             let idealHeight = textHeight + (padding * 2);
             
             // Use the smaller of ideal height or max available height
-            let lightboxHeight = Math.min(idealHeight, maxAvailableHeight) * 1.125;  // Add 2.5% to height
+            let lightboxHeight = Math.min(idealHeight, maxAvailableHeight) * 1.025;  // Add 2.5% to height
+            
+            // Check if content is truncated
+            let isTruncated = idealHeight > maxAvailableHeight;
             
             let lightboxX = (width - lightboxWidth) / 2;
-            let lightboxY = (height - lightboxHeight) / 2 - (buttonSpace / 2);  // Center between buffers
+            
+            // Calculate minimum distance from bottom (70px)
+            let minDistanceFromBottom = 70;
+            let maxLightboxY = height - lightboxHeight - minDistanceFromBottom;
+            
+            // Calculate minimum distance from top (10px)
+            let minDistanceFromTop = 10;
+            let minLightboxY = minDistanceFromTop;
+            
+            // Center with buffer above buttons, but ensure minimum distances from top and bottom
+            let centeredY = (height - lightboxHeight) / 2 - (buttonSpace / 2) - (buttonBuffer / 2);
+            let lightboxY = Math.max(minLightboxY, Math.min(centeredY, maxLightboxY));
             
             // Update text container
             if (!textContainer) {
@@ -323,6 +354,19 @@
                 textContainer.style('color', '#f0f0f0');
                 textContainer.style('padding-right', '10px');
                 textContainer.html(textContent);
+                
+                // Add scroll event listener
+                textContainer.elt.addEventListener('scroll', function() {
+                    let scrollTop = this.scrollTop;
+                    let scrollHeight = this.scrollHeight;
+                    let clientHeight = this.clientHeight;
+                    
+                    // Check if at top
+                    isScrolledToTop = scrollTop <= 5; // Small tolerance for rounding
+                    
+                    // Check if at bottom
+                    isScrolledToBottom = scrollTop + clientHeight >= scrollHeight - 5; // Small tolerance
+                });
             }
             
             // Position and size the container
@@ -342,7 +386,8 @@
                 x: lightboxX,
                 y: lightboxY,
                 width: lightboxWidth,
-                height: lightboxHeight
+                height: lightboxHeight,
+                isTruncated: isTruncated
             };
         }
 
@@ -543,6 +588,34 @@
                 fill(34, 34, 34, 245);  // #222 with slight transparency
                 rect(lightbox.x, lightbox.y, lightbox.width, lightbox.height, 20);
                 
+                // Add scroll indicator if content is truncated
+                if (lightbox.isTruncated) {
+                    // Draw transparent area at bottom (no gradient)
+                    let gradientHeight = 30;
+                    let gradientY = lightbox.y + lightbox.height - gradientHeight;
+                    
+                    // Make the area transparent (no drawing needed)
+                    
+                    // Add scroll indicator arrow
+                    fill(240, 240, 240, 120);  // Semi-transparent white
+                    noStroke();
+                    
+                    let arrowSize = 12;
+                    let arrowX = lightbox.x + lightbox.width / 2;
+                    
+                    if (!isScrolledToBottom) {
+                        // Show up arrow at bottom when not at bottom
+                        let arrowY = lightbox.y + lightbox.height - 17;  // Float 17px above bottom (moved down 3px)
+                        
+                        // Draw up arrow triangle (pointing up)
+                        triangle(
+                            arrowX, arrowY + arrowSize,        // Bottom point
+                            arrowX - arrowSize/2, arrowY,      // Top left
+                            arrowX + arrowSize/2, arrowY       // Top right
+                        );
+                    }
+                }
+                
                 // Reset shadow
                 drawingContext.shadowColor = 'transparent';
             } else if (textContainer) {
@@ -561,6 +634,28 @@
             blurBuffer = createGraphics(windowWidth, windowHeight);
             calculateDimensions();
             ball.velocity = 20;
+            // Update slider width to maintain one-third of window width
+            if (forceSlider) {
+                let maxSliderWidth = width / 3;
+                forceSlider.style('width', `${maxSliderWidth}px`);
+            }
+            
+            // Update slider label width
+            let sliderLabel = select('p');
+            if (sliderLabel) {
+                let maxSliderWidth = width / 3;
+                sliderLabel.style('width', `${maxSliderWidth}px`);
+                
+                // Update slider position after label width changes
+                setTimeout(() => {
+                    if (sliderLabel && forceSlider) {
+                        let labelHeight = sliderLabel.elt.offsetHeight;
+                        let sliderY = 15 + labelHeight + 10; // 15px (label top) + label height + 10px spacing
+                        forceSlider.position(20, sliderY);
+                    }
+                }, 0);
+            }
+            
             // Update button bar position and width
             if (buttonBar) {
                 if (diagramButtonVisible) {
