@@ -69,7 +69,7 @@
         let blockHeight = 0;  // Will be set dynamically
         let wallY;  // Will be set dynamically
         let textContainer;  // Reference to the text container
-        let textContent = "The ball appears static, but written into its code is a constant force, forever trying to propel it upward and out of the window.<br><br>An indestructible and immovable metal bar sits above the ball and is angled perpendicular to the encoded force. The scene exists in a vacuum, meaning there is no friction, no gravity, and no air resistance.<br><br>Visually and functionally nothing changes as you watch this scene. It will always be a live stream of a red ball trapped in the pursuit of an impossible task.";
+        let textContent = "The ball appears static, but written into its code is a constant force, forever trying to propel it upward and out of the window.<br><br>An indestructible and immovable wall sits above the ball and is angled perpendicular to the encoded force. The scene exists in a vacuum, meaning there is no friction, no gravity, and no air resistance.<br><br>Visually and functionally nothing changes as you watch this scene. It will always be a live stream of a ball trapped in the pursuit of an impossible task.";
         let buttonBar; // Container for the two buttons
         let diagramButtonVisible = false; // Track if Show Diagram should be shown
         let diagramButtonReady = false; // Track if Show Diagram button is ready for text
@@ -447,9 +447,9 @@
                 ball.x - ball.radius/2, ball.y - ball.radius/2, 0,  // Inner circle (highlight)
                 ball.x, ball.y, ball.radius  // Outer circle (shadow)
             );
-            ballGradient.addColorStop(0, '#ff6b6b');    // Bright red at center
-            ballGradient.addColorStop(0.7, '#ff0000');  // Medium red
-            ballGradient.addColorStop(1, '#cc0000');    // Dark red at edges
+            ballGradient.addColorStop(0, '#666666');    // Bright black at center
+            ballGradient.addColorStop(0.7, '#333333');  // Medium black
+            ballGradient.addColorStop(1, '#000000');    // Dark black at edges
             drawingContext.fillStyle = ballGradient;
             circle(ball.x, ball.y, ball.radius * 2);
 
@@ -514,8 +514,8 @@
                 blurBuffer.clear();
                 
                 // Draw background boxes in the blur buffer
-                blurBuffer.fill(34, 34, 34, 225);  // Eerie black (#222) with 88% opacity
-                blurBuffer.noStroke();
+                blurBuffer.fill(236, 217, 186, 225);  // Eerie black (#222) with 88% opacity
+                blurBuffer.stroke(34, 34, 34, 225);
                 blurBuffer.rect(notationX - ball.radius * 0.1, velocityY - ball.radius * 0.25, velocityWidth, ball.radius * 0.325, ball.radius * 0.06);
                 blurBuffer.rect(notationX - ball.radius * 0.1, forceY - ball.radius * 0.25, forceWidth, ball.radius * 0.325, ball.radius * 0.07);
                 blurBuffer.rect(notationX - ball.radius * 0.1, wallForceY - ball.radius * 0.25, wallForceWidth, ball.radius * 0.325, ball.radius * 0.07);
@@ -524,7 +524,7 @@
                 image(blurBuffer, 0, 0);
                 
                 // Draw the labels with arrows
-                fill(240, 240, 240);  // Light gray/white for text
+                fill(0, 0, 0);  // Black for text
                 noStroke();  // Remove text outline
                 textSize(ball.radius * 0.18);  // 18% of ball radius
                 textAlign(LEFT, BASELINE);  // Left align for text
