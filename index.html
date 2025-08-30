@@ -61,7 +61,7 @@
         let forceSlider; // Slider for force control
         let showUI = false;  // Toggle for UI elements
         let showInfo = false;  // Toggle for info lightbox
-        let startTime;  // Track when the sketch started
+
         let infoButton;  // Button for info lightbox
         let uiButton;    // Button for UI elements
         let infoButtonUsed = false;  // Track if info button has been used
@@ -97,7 +97,6 @@
         function setup() {
             createCanvas(windowWidth, windowHeight);
             blurBuffer = createGraphics(windowWidth, windowHeight);  // Create buffer
-            startTime = millis();  // Record start time
             
             // Calculate initial dimensions
             calculateDimensions();
@@ -131,7 +130,7 @@
             buttonBar.style('border-radius', '8px');
             buttonBar.style('background', 'rgba(255,255,255,0.95)');
             buttonBar.style('z-index', '10');
-            buttonBar.style('transition', 'width 0.5s, left 0.5s');
+
             buttonBar.style('width', '140px');
             buttonBar.style('height', '48px');
             
@@ -191,12 +190,10 @@
                 buttonDivider.style('top', '20%');
                 buttonDivider.style('z-index', '2');  // Lower than glow
                 buttonDivider.style('opacity', '0');
-                buttonDivider.style('transition', 'opacity 0.3s');
+
             }
-            // Fade in the divider
-            setTimeout(() => {
-                buttonDivider.style('opacity', '1');
-            }, 500);
+            // Show the divider immediately
+            buttonDivider.style('opacity', '1');
             // Create diagram button if not already
             if (!uiButton) {
                 diagramButtonReady = false;
@@ -230,20 +227,16 @@
                     select('p').style('display', showUI ? 'block' : 'none');
                     if (textContainer) textContainer.remove();
                 });
-                // Fade in the text after the transition completes
-                setTimeout(() => {
-                    diagramButtonReady = true;
-                    uiButton.html('Show Diagram');
-                }, 500);
+                // Show the text immediately
+                diagramButtonReady = true;
+                uiButton.html('Show Diagram');
             } else {
                 diagramButtonReady = false;
                 uiButton.style('background', '#222 !important');
                 uiButton.style('color', '#f0f0f0 !important');
                 uiButton.style('visibility', 'visible');
-                setTimeout(() => {
-                    diagramButtonReady = true;
-                    uiButton.html('Show Diagram');
-                }, 500);
+                diagramButtonReady = true;
+                uiButton.html('Show Diagram');
             }
             updateButtonBarStyles();
         }
@@ -363,24 +356,12 @@
             textSize(25);
             textLeading(0);
             
-            // Update button state based on time
-            let timeElapsed = millis() - startTime;
-            if (timeElapsed <= 5000) {
-                // During countdown period
-                infoButton.style('background-color', '#444');
-                infoButton.style('opacity', '0.7');
-                infoButton.style('cursor', 'default');
-                infoButton.style('pointer-events', 'none');
-                let secondsLeft = Math.ceil((5000 - timeElapsed) / 1000);
-                infoButton.html(`Show Info (${secondsLeft}s)`);
-            } else {
-                // After countdown period
-                infoButton.style('background-color', '#222');
-                infoButton.style('opacity', '1');
-                infoButton.style('cursor', 'pointer');
-                infoButton.style('pointer-events', 'auto');
-                infoButton.html(showInfo ? 'Hide Info' : 'Show Info');
-            }
+            // Update button state (no countdown - always enabled)
+            infoButton.style('background-color', '#222');
+            infoButton.style('opacity', '1');
+            infoButton.style('cursor', 'pointer');
+            infoButton.style('pointer-events', 'auto');
+            infoButton.html(showInfo ? 'Hide Info' : 'Show Info');
             
             // Update force from slider
             ball.force = forceSlider.value();
