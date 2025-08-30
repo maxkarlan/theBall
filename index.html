@@ -483,7 +483,7 @@
                 
                 // Draw velocity vector (blue) on top
                 stroke(50, 170, 255);  // Eerie black (#222)
-                strokeWeight(ball.radius * 0.02);  // 2% of ball radius
+                strokeWeight(ball.radius * 0.04);  // 2% of ball radius
                 let velocityLength = effectiveVelocity * 0.5; // Scale down for visualization
                 drawArrow(ball.x, ball.y, ball.x, ball.y - velocityLength, ball.radius * 0.1);
 
