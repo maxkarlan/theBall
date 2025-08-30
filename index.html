@@ -464,8 +464,9 @@
                 let effectiveVelocity = (ball.y - ball.radius <= wallY + blockHeight || Math.abs(ball.velocity) < 1) ? 0 : ball.velocity;
                 
                 // Draw force vector (green) first
-                stroke(34, 34, 34);  // Eerie black (#222)
-                strokeWeight(ball.radius * 0.02);  // 2% of ball radius
+                stroke(0, 201, 123);  // Eerie black (#222)
+                strokeWeight(ball.radius * 0.04);  // 2% of ball radius
+            
                 let maxForceLength = ball.radius * 2; // Maximum length is 2x ball radius
                 let minForceLength = maxForceLength * 0.2; // Minimum length is 1/5th of maximum
                 let forceLength = map(ball.force, 20, 100, minForceLength, maxForceLength); // Map from min to max length
@@ -475,12 +476,13 @@
                 drawArrow(ball.x, ball.y, ball.x, ball.y - forceLength, ball.radius * 0.1);  // Arrow size 10% of ball radius
                 
                 // Draw downward force arrow (dotted)
+                stroke(225, 17, 50);  // Ruby color
                 drawingContext.setLineDash([ball.radius * 0.05, ball.radius * 0.05]);  // Dotted line, dash size 5% of ball radius
                 drawArrow(ball.x, ball.y, ball.x, ball.y + forceLength, ball.radius * 0.1);
                 drawingContext.setLineDash([]);  // Reset to solid line
                 
                 // Draw velocity vector (blue) on top
-                stroke(34, 34, 34);  // Eerie black (#222)
+                stroke(50, 170, 255);  // Eerie black (#222)
                 strokeWeight(ball.radius * 0.02);  // 2% of ball radius
                 let velocityLength = effectiveVelocity * 0.5; // Scale down for visualization
                 drawArrow(ball.x, ball.y, ball.x, ball.y - velocityLength, ball.radius * 0.1);
